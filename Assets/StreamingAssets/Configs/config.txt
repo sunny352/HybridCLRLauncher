@@ -1,0 +1,13 @@
+{
+    "app": {
+        "version": "0.0.1",
+        "url": "market://details?id=#PACKAGE#"
+    },
+    "packages": [
+        {
+            "name": "demo",
+            "main": "http://127.0.0.1/main/demo",
+            "fallback": "http://127.0.0.1/fallback/demo"
+        }
+    ]
+}
