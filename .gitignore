@@ -73,3 +73,5 @@ crashlytics-build.properties
 *.DotSettings
 /.idea
 .DS_Store
+/Bundles
+/yoo
