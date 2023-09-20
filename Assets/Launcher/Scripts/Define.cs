@@ -2,6 +2,7 @@
 {
     public static class Define
     {
-        public static readonly string Url = "streaming:///Configs/config.json";
+        public const string Url = "streaming:///Configs/config.json";
+        public const string LauncherPackageName = "launcher";
     }
 }

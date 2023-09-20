@@ -3,8 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
 
-#if UNITY_EDITOR
-#else
+#if HOST_PLAY_MODE
 using Launcher.Yoo;
 #endif
 
@@ -12,31 +11,40 @@ namespace Launcher
 {
     public class Package
     {
-        private string Name { get; }
-        private string MainUrl { get; }
-        private string FallbackUrl { get; }
+        public string Name { get; }
+        public string MainUrl { get; set; }
+        public string FallbackUrl { get; set; }
 
-        public Package(string name, string mainUrl, string fallbackUrl)
+        public Package(string name, string mainUrl = "", string fallbackUrl = "")
         {
             Name = name;
             MainUrl = mainUrl;
             FallbackUrl = fallbackUrl;
         }
 
+        private bool _isInit;
+
         public async Task Init()
         {
-            var package = YooAssets.CreatePackage(Name);
-#if UNITY_EDITOR
-            var initializeParameters = new EditorSimulateModeParameters
+            if (_isInit)
             {
-                SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Name),
-            };
-#else
+                return;
+            }
+
+            _isInit = true;
+
+            var package = YooAssets.CreatePackage(Name);
+#if HOST_PLAY_MODE
             var initializeParameters = new HostPlayModeParameters
             {
                 BuildinQueryServices = new BuildinQueryServices(),
                 DeliveryQueryServices = new DeliveryQueryServices(),
-                RemoteServices = new RemoteServices(MainUrl, FallbackUrl)
+                RemoteServices = new RemoteServices(this)
+            };
+#else
+            var initializeParameters = new EditorSimulateModeParameters
+            {
+                SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Name),
             };
 #endif
             var initializationOperation = package.InitializeAsync(initializeParameters);
@@ -123,22 +131,23 @@ namespace Launcher
             manifestOperation.SavePackageVersion();
             return true;
         }
-        
+
         private void OnDownloadOverFunction(bool isSucceed)
         {
             Debug.Log($"[{Name}] OnDownloadOverFunction : {isSucceed}");
         }
-        
-        private void OnDownloadProgressUpdateFunction(int totalDownloadCount, int lastDownloadCount, long totalDownloadBytes, long lastDownloadBytes)
+
+        private void OnDownloadProgressUpdateFunction(int totalDownloadCount, int lastDownloadCount,
+            long totalDownloadBytes, long lastDownloadBytes)
         {
             // Debug.Log($"[{Name}] OnDownloadProgressUpdateFunction : {totalDownloadCount}, {lastDownloadCount}, {totalDownloadBytes}, {lastDownloadBytes}");
         }
-        
+
         private void OnDownloadErrorFunction(string fileName, string error)
         {
             Debug.LogError($"[{Name}] OnDownloadErrorFunction : {fileName}, {error}");
         }
-        
+
         private void OnStartDownloadFileFunction(string fileName, long fileSize)
         {
             Debug.Log($"[{Name}] OnStartDownloadFileFunction : {fileName}, {fileSize}");

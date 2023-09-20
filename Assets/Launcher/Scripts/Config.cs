@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -49,8 +49,7 @@ namespace Launcher
                         var fullPath = $"{Application.streamingAssetsPath}{path}";
                         var json = await File.ReadAllTextAsync(fullPath);
 #else
-                        var response = await UnityWebRequest.Get(fullPath)
-                            .SendWebRequest();
+                        var response = await UnityWebRequest.Get(uri).SendWebRequest();
                         var json = response.downloadHandler.text;
 #endif
                         return JsonConvert.DeserializeObject<Config>(json);

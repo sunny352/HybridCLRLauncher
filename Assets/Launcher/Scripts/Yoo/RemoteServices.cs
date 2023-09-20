@@ -4,21 +4,19 @@ namespace Launcher.Yoo
 {
     public class RemoteServices : IRemoteServices
     {
-        private readonly string _mainUrl;
-        private readonly string _fallbackUrl;
-        public RemoteServices(string mainUrl, string fallbackUrl)
+        private readonly Package _package;
+        public RemoteServices(Package package)
         {
-            _mainUrl = mainUrl;
-            _fallbackUrl = fallbackUrl;
+            _package = package;
         }
         public string GetRemoteMainURL(string fileName)
         {
-            return $"{_mainUrl}/{fileName}";            
+            return $"{_package.MainUrl}/{fileName}";            
         }
 
         public string GetRemoteFallbackURL(string fileName)
         {
-            return $"{_fallbackUrl}/{fileName}";
+            return $"{_package.FallbackUrl}/{fileName}";
         }
     }
 }

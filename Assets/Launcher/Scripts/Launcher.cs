@@ -9,38 +9,46 @@ namespace Launcher
 {
     public class Launcher : MonoBehaviour
     {
-        private void Start()
+        private async void Start()
         {
             Debug.Log($"[Launcher] Start");
+            await Init();
             RunUpdate();
         }
 
+        private async Task Init()
+        {
+            YooAssets.Initialize();
+            var launcherPackage = new Package(Define.LauncherPackageName);
+            await launcherPackage.Init();
+            _packages.Add(launcherPackage);
+        }
         private async void RunUpdate()
         {
+            await ShowLogo();
             var config = await ConfigLoader.Load();
             //初始化资源包
             await InitPackages(config.Packages);
-            await ShowLogo();
             //检查更新
             await CheckAndUpdate(config.App.Version, config.App.Url);
         }
 
-        private List<Package> _packages;
+        private readonly List<Package> _packages = new List<Package>();
         private async Task InitPackages(IEnumerable<PackageConfig> packageConfigs)
         {
-            YooAssets.Initialize();
-            _packages = new List<Package>();
-            var isExistLauncher = false;
             foreach (var packageConfig in packageConfigs)
             {
-                isExistLauncher = isExistLauncher || packageConfig.Name == "launcher";
-                var package = new Package(packageConfig.Name, packageConfig.MainUrl, packageConfig.FallbackUrl);
-                _packages.Add(package);
-            }
-            if (!isExistLauncher)
-            {
-                var launcherPackage = new Package("launcher", "", "");
-                _packages.Add(launcherPackage);
+                var package = _packages.Find(item => item.Name == packageConfig.Name);
+                if (null != package)
+                {
+                    package.MainUrl = packageConfig.MainUrl;
+                    package.FallbackUrl = packageConfig.FallbackUrl;
+                }
+                else
+                {
+                    package = new Package(packageConfig.Name, packageConfig.MainUrl, packageConfig.FallbackUrl);
+                    _packages.Add(package);
+                }
             }
             await Task.WhenAll(_packages.Select(package => package.Init()));
         }
@@ -77,7 +85,7 @@ namespace Launcher
         private async Task ShowLogo()
         {
             Debug.Log($"[Launcher] ShowLogo Start");
-            var launcherPackage = YooAssets.GetPackage("launcher");
+            var launcherPackage = YooAssets.GetPackage(Define.LauncherPackageName);
             var uiLogoHandle = launcherPackage.LoadAssetSync("Assets/Launcher/Prefabs/UILogo.prefab");
             var uiLogoPrefab = uiLogoHandle.GetAssetObject<GameObject>();
             var uiLogoObj = Instantiate(uiLogoPrefab);
