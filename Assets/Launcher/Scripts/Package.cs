@@ -61,6 +61,10 @@ namespace Launcher
 
         public async Task<bool> CheckAndUpdate()
         {
+            if (string.IsNullOrEmpty(MainUrl) && string.IsNullOrEmpty(FallbackUrl))
+            {
+                return true;
+            }
             var package = YooAssets.GetPackage(Name);
             var versionOperation = package.UpdatePackageVersionAsync();
             await versionOperation;

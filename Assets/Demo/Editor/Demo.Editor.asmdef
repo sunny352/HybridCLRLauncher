@@ -1,7 +1,7 @@
 {
     "name": "Demo.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": ["GUID:40c8ed22378abd047ab67f6bf4dc554e","GUID:4d1926c9df5b052469a1c63448b7609a","GUID:6ec74d70ece728c4ca4a2c587dbb427a"],
     "includePlatforms": [
         "Editor"
     ],

@@ -6,7 +6,7 @@ namespace Launcher.Yoo
     {
         public bool QueryStreamingAssets(string packageName, string fileName)
         {
-            return false;
+            return packageName == Define.LauncherPackageName;
         }
     }
 }
